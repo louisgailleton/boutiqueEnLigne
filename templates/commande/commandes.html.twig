@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Vos commandes{% endblock %}
+
+{% block stylesheets %}
+    {{ encore_entry_link_tags('panierCss') }}
+    {{ encore_entry_link_tags('app') }}
+{% endblock %}
+
+{% block body %}
+    <h1>Vos commandes</h1>
+
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Numéro</th>
+                <th>État</th>
+                <th>Date</th>
+                <th>Montant</th>
+                <th>Voir</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for commande in commandes %}
+            <tr>
+                <td>{{ commande.id }}</td>
+                <td>{{ commande.etatCommande }}</td>
+                <td>{{ commande.dateCommande|date('d-m-Y H:i:s') }}</td>
+                <td>{{ commande.montantCommande }} €</td>
+                <td><a href="{{ path('app_commande_show', {'id': commande.id}) }}" class="btn btn-success">Voir</a></td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">Vous n'avez aucune commande</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

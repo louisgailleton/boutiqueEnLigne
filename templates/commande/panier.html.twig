@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Panier{% endblock %}
+
+{% block stylesheets %}
+    {{ encore_entry_link_tags('panierCss') }}
+    {{ encore_entry_link_tags('app') }}
+{% endblock %}
+
+{% block body %}
+    <h1>Panier</h1>
+    <table class="table table-striped table-hover">
+        <thead>            
+            <tr>
+                <th>Id</th>
+                <th>Article</th>
+                <th>Prix unitaire</th>
+                <th>Quantité</th>
+                <th>Montant</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set montantTotal = 0 %}
+            {% for nomArt, proprArt in panier %}
+                <!-- On récupère la quantité de l'article pour mettre une limite sur la quantité disponible pour l'utilisateur -->
+                {% set qteBdd = 0 %}
+                {% for artBdd in articlesBdd %}
+                    {% if nomArt == artBdd.nom %}
+                        {% set qteBdd = artBdd.qte %}
+                    {% endif %}
+                {% endfor %}
+                
+                <tr id="lignePanier_{{ proprArt.id }}">
+                    <td>{{ proprArt.id }}</td>
+                    <td>{{ nomArt }}</td>
+                    <td><span id="prixUArticle_{{ proprArt.id }}">{{ proprArt.prixU }}</span> €</td>
+                    <td>
+                        <div class="row">   
+                            <form>
+                                <input type="number" id="qtePanier_{{ proprArt.id }}" name="qte" max="{{ qteBdd }}" min="0" value="{{ proprArt.qtePanier }}">
+                            </form>
+                            <button class="btn btn-primary btnAjax" data-idarticle="{{ proprArt.id }}">Modifier</button>
+                            <button class="btn btnSuppressionAjax" data-idarticle="{{ proprArt.id }}"><i class="bi bi-trash3"></i></button>
+                        </div>
+                        
+                    </td>
+                    <td><span class="montantTotalArticle" id="montantTotArticle_{{proprArt.id }}">{{ proprArt.qtePanier * proprArt.prixU }}</span> €</td>
+                </tr>                
+                {% set montantTotal = montantTotal + (proprArt.qtePanier * proprArt.prixU) %}
+            {% else %}
+                <tr class="texteCentre"><td colspan="5">Votre panier est vide</td></tr>
+            {% endfor %}
+            {% if panier|length > 0%}
+                <tr class="texteCentre" id="ligneMontantPanier">
+                    <td colspan="4">Montant total : <span id="montantTotal">{{ montantTotal }}</span> €</td>
+                    <td><a href="{{ path('app_commande_commander') }}" class="btn btn-success">Commander</a></td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+
+    <div id="divMsgPanier" class="alert">
+        <span id="msgPanier"></span>
+        <button id="btnMsgPanier" class="btn"><i class="bi bi-x-lg"></i></button>
+    </div>
+
+    <a href="{{ path('app_index') }}" class="btn btn-warning">Retour à l'accueil</a>
+{% endblock %}
+
+{% block javascripts %}
+    {{ encore_entry_script_tags('modifQtePanier') }}
+{% endblock %}

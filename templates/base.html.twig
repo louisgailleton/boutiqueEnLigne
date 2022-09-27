@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Boutique en ligne{% endblock %}</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+        {{ encore_entry_link_tags('app') }}
+        {% block stylesheets %}{% endblock %}
+        </head>
+    <body>
+        <!-- On recupère le nombre total d'articles dans le panier -->
+        {% set panier, totalArticle = app.session.get('panier'), 0 %}
+        {% for nomArt, proprArt in panier %}
+            {% set totalArticle = totalArticle + proprArt.qtePanier %}
+        {% endfor %}
+
+        <div class="container">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <a class="navbar-brand" href="{{ path('app_index') }}">Boutique en ligne</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon"></span>
+                </button>
+              
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav mr-auto">
+                        {% for cat in categoriesMenu.findAll() %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('app_categorie_articles', {'id': cat.id}) }}">{{ cat.nom }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <!-- On affiche le nombre total d'articles à côté de l'icône du panier -->
+                            <a class="nav-link" href="{{ path('app_commande_panier') }}">Mon panier <i class="bi bi-cart3"> <span id="totalArticleMenu">{{ totalArticle }}</span></i></a>
+                        </li>
+                        {% if app.user %}
+					        <ul class="navbar-nav mr-auto">
+                                {% if is_granted('ROLE_USER') %}
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{app.user.prenom}} {{app.user.nom}}</a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">                                            
+                                            <a class="nav-link" href="#"></i>Mon Compte <i class="bi bi-person"></i></a>
+                                            <a class="nav-link" href="{{ path('app_commande_commandes') }}"></i>Mes commandes <i class="bi bi-handbag"></i></a>
+                                            <a class="nav-link" href="{{ path('app_logout') }}"></i>Se déconnecter <i class="bi bi-door-open"></i></a>
+                                        </div>
+                                    </li>
+                                {% elseif is_granted('ROLE_ADMIN') %}
+
+                                {% endif %}
+                            </ul>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('app_login') }}"></i>Se connecter<i class="bi bi-person"></i></a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </nav>
+            {% block body %}
+            {% endblock %}
+            <!-- Affichage des messages flash, demande une couleur bootstrap (danger, success...) et un message -->
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ label }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+            
+        {% block javascripts %}
+        {% endblock %}
+        {{ encore_entry_script_tags('app') }}
+            <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+            <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+        
+    </body>
+</html>

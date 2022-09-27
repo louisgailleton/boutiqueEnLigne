@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ categorie.nom }}{% endblock %}
+
+
+{% block stylesheets %}
+    {{ encore_entry_link_tags('panierCss') }}
+    {{ encore_entry_link_tags('app') }}
+{% endblock %}
+
+{% block body %}
+    <h1>{{ categorie.nom }}</h1>
+
+    <table class="table table-striped table-hover">
+        <thead>            
+            <tr>
+                <th>Libellé</th>
+                <th>Description</th>
+                <th>Prix</th>
+                <th>Quantité</th>
+                <th>Commander</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for art in articles %}
+                  <tr>
+                    <td>{{ art.nom }}</td>
+                    <td>{{ art.description }}</td>
+                    <td>{{ art.prix }} €</td>
+                    <td>{{ art.qte }}</td>
+                    <td>
+                        <div class="row">
+                            <form>
+                                <input type="number" id="qte_{{ art.id }}" name="qte" max="{{ art.qte }}" min="1">
+                            </form>
+                            <button class="btn btn-success btnAjax" data-idarticle="{{ art.id }}">Ajouter au panier</button>
+                        </div>
+                    </td>
+                  </tr>
+            {% else %}
+                <tr class="texteCentre"><td colspan="5">Aucun article dans cette catégorie</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Div pour afficher le message reçu après la requête AJAX -->
+    <div id="divMsgPanier" class="alert">
+        <span id="msgPanier"></span>
+        <button id="btnMsgPanier" class="btn"><i class="bi bi-x-lg"></i></button>
+    </div>
+
+    <a href="{{ path('app_index') }}" class="btn btn-warning">Retour à l'accueil</a>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ encore_entry_script_tags('ajoutQtePanier') }}
+{% endblock %}
